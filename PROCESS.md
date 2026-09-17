@@ -1,15 +1,22 @@
 # Process
 
-<!-- Same as assignment 1, same honesty. Which tools you used and for what; one
-thing you kept and why it was good; one thing you rejected and why it was wrong.
-"I did not use any" is fine if it is true.
-
-If a model wrote most of plot.py, which is likely and allowed, the interesting part
-is what you had to correct: did it invent a column name, use pandas where a list
-would do, silently drop the rows it could not parse? -->
-
 ## Tools
+
+- Python for downloading and processing the earthquake data.
+- `uv` for running the Python scripts and managing the script dependency on Matplotlib.
+- Matplotlib for creating the earthquake visualization.
+- Git and GitHub for version control and publishing the project.
+- USGS GeoJSON feed for the earthquake data.
 
 ## Kept
 
+I kept the downloaded earthquake GeoJSON file unchanged as
+`data/earthquakes.geojson`. This keeps the raw data separate from the
+plotting code and allows the plotting program to work without another
+internet connection.
+
 ## Rejected
+
+I rejected the original weather-data example from the template because
+this project is about earthquakes. I replaced that example with a USGS
+earthquake data workflow and a global earthquake plot.

@@ -1,34 +1,32 @@
-# The phenomenon
-
-<!-- This is the SD5913 assignment 2 template. Everything in this file is yours to
-replace, and the check counts words: comments like this one are not words, so
-delete each one as you write. Start with the heading: name the phenomenon.
-
-Then, in this order, at least 150 words in total.
-
-New to folders, paths, or the files here whose names start with a dot? Read
-https://github.com/sd5913/pfad/blob/2026/reference/files.md first. Ten minutes. -->
-
-![what the picture is](out/plot.png)
+# Global Earthquakes in the Last 30 Days
 
 ## The phenomenon
 
-<!-- What goes up and down, and why you looked at it. -->
+Earthquakes happen when stress stored in the Earth's crust is suddenly released. They occur every day around the world, even when nobody nearby feels them. I chose earthquakes because the events are global and can be measured as both location and magnitude.
+
+This project looks at earthquakes recorded by the USGS during the most recent 30-day period available when I fetched the data. Each earthquake has a geographic position and a magnitude, so I use a scatter plot: longitude and latitude show where earthquakes happened, while the size of each point represents its magnitude.
 
 ## The source
 
-<!-- A link to the page or endpoint the file came from, and one line on what is in
-the file: how many rows, what a row means, what the units are. -->
+The data comes from the United States Geological Survey (USGS) Earthquake Hazards Program:
+
+https://earthquake.usgs.gov/earthquakes/feed/
+
+I used the USGS GeoJSON feed for all earthquakes in the past 30 days. The downloaded file is saved unchanged as `data/earthquakes.geojson`, so the plotting program does not need an internet connection.
+
+The file contains one GeoJSON feature for each earthquake. Each feature includes its longitude, latitude, and magnitude. My downloaded file contains 11,037 earthquake records.
+
+## The picture
+
+![Global earthquakes in the last 30 days](out/earthquakes.png)
 
 ## What the picture shows
 
-<!-- Two or three sentences. Including what it hides: every transformation throws
-something away, and naming what yours threw away is the easiest way to sound like
-you know what you did. -->
+The picture maps the earthquakes by longitude and latitude. Larger circles represent larger earthquake magnitudes, so the visual shows both the geographic distribution of earthquakes and the relative size of the events.
+
+The picture hides the exact time of each earthquake and most of the other information supplied by USGS. It also does not show depth, so earthquakes at different depths can appear together at the same surface location.
 
 ## Run it
 
-```
-uv run fetch.py
-uv run plot.py
-```
+`uv run fetch.py`
+`uv run plot.py`

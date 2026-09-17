@@ -3,65 +3,70 @@
 # dependencies = ["matplotlib"]
 # ///
 
-"""
-Read the file in data/, make one picture, save it to out/.
-
-    uv run plot.py
-
-Three parts, and you will replace all three: rows() reads the file the way *your*
-file needs reading, the loop in main() picks the numbers out of it, and the plot at
-the bottom is the transformation you chose. Print before you plot.
-"""
-
-import csv
+import json
 from pathlib import Path
 
 import matplotlib.pyplot as plt
 
-FILE = "hko-daily-mean-temperature-2026.csv"   # CHANGE ME: the same name as in fetch.py
-PICTURE = "plot.png"                           # what goes into out/, and into the README
 
-HERE = Path(__file__).parent
-DATA = HERE / "data" / FILE
-OUT = HERE / "out"
-
-
-def rows(path):
-    """The file as a list of lists, one per line. The Observatory puts three lines
-    of titles above the table and a legend below it, so keep only the lines that
-    start with a year."""
-    kept = []
-    with path.open(encoding="utf-8-sig", newline="") as handle:
-        for line in csv.reader(handle):
-            if line and line[0].isdigit():
-                kept.append(line)
-    return kept
+def point_size(magnitude):
+    """Turn earthquake magnitude into a visible point size."""
+    if magnitude is None:
+        return 0
+    return max(2, magnitude**3)
 
 
-def main():
-    table = rows(DATA)
-    print(f"{DATA.name}: {len(table)} rows. The first one: {table[0]}")
+def make_plot(data_file, output_file):
+    with open(data_file, encoding="utf-8") as file:
+        data = json.load(file)
 
-    days, values = [], []
-    for i, (year, month, day, value, quality) in enumerate(table):   # the loop over the numbers
-        if value == "***":                   # the Observatory's word for "missing"
+    longitudes = []
+    latitudes = []
+    sizes = []
+
+    skipped = 0
+
+    for earthquake in data["features"]:
+        magnitude = earthquake["properties"]["mag"]
+        coordinates = earthquake["geometry"]["coordinates"]
+
+        if magnitude is None or coordinates[0] is None or coordinates[1] is None:
+            skipped += 1
             continue
-        days.append(i + 1)
-        values.append(float(value))          # it arrived as text; make it a number
-    print(f"{len(values)} values, from {min(values)} to {max(values)}")
 
-    fig, ax = plt.subplots(figsize=(10, 4))
-    ax.plot(days, values, color="#d6591d", linewidth=1.5)
-    ax.set_xlabel("day of 2026")
-    ax.set_ylabel("daily mean temperature, °C")
-    ax.set_title("Hong Kong Observatory, 2026 so far")
-    fig.tight_layout()
+        longitudes.append(coordinates[0])
+        latitudes.append(coordinates[1])
+        sizes.append(point_size(magnitude))
 
-    OUT.mkdir(exist_ok=True)
-    fig.savefig(OUT / PICTURE, dpi=150)
-    print(f"saved out/{PICTURE}")
-    plt.show()
+    Path(output_file).parent.mkdir(exist_ok=True)
+
+    plt.figure(figsize=(14, 7))
+
+    plt.scatter(
+        longitudes,
+        latitudes,
+        s=sizes,
+        alpha=0.45,
+    )
+
+    plt.xlabel("Longitude (degrees)")
+    plt.ylabel("Latitude (degrees)")
+    plt.title("Global Earthquakes — Last 30 Days")
+
+    plt.xlim(-180, 180)
+    plt.ylim(-90, 90)
+
+    plt.grid(alpha=0.2)
+
+    plt.tight_layout()
+    plt.savefig(output_file, dpi=200)
+    plt.close()
+
+    print(f"Plotted {len(longitudes)} earthquakes.")
+    print(f"Skipped {skipped} records without usable location or magnitude.")
 
 
-if __name__ == "__main__":
-    main()
+make_plot(
+    "data/earthquakes.geojson",
+    "out/earthquakes.png",
+)
